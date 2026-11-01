@@ -1,0 +1,16 @@
+{
+  "name": "guitar-tuner",
+  "version": "1.0.0",
+  "description": "PC 吉他调音器 — 麦克风实时音高检测与弧形刻度 UI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging"
+  },
+  "keywords": ["tuner", "guitar", "electron", "audio"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.2.0"
+  }
+}

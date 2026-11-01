@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; media-src 'self' mediadevices:; img-src 'self' data:;" />
+  <title>Guitar Tuner</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- ── Header ── -->
+    <header class="header">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5" opacity="0.35"/>
+            <circle cx="14" cy="14" r="4" fill="currentColor"/>
+            <path d="M14 2v4M14 22v4M2 14h4M22 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Guitar Tuner</h1>
+          <p class="brand-sub">麦克风实时调音</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <label class="field">
+          <span class="field-label">乐器</span>
+          <select id="instrument" class="select" disabled>
+            <option value="guitar" selected>吉他</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="field-label">调弦模式</span>
+          <select id="tuning-mode" class="select"></select>
+        </label>
+        <button id="mic-btn" class="btn btn-primary" type="button">
+          <span class="btn-icon" id="mic-icon">🎤</span>
+          <span id="mic-label">开启麦克风</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── Status ribbon ── -->
+    <div id="status-ribbon" class="status-ribbon is-idle">
+      <span id="status-dot" class="status-dot"></span>
+      <span id="status-text">点击「开启麦克风」开始调音</span>
+    </div>
+
+    <!-- ── Main tuner stage ── -->
+    <main class="stage">
+      <!-- Arc gauge -->
+      <div class="gauge-wrap">
+        <div class="gauge-stage">
+        <svg id="gauge" class="gauge" viewBox="0 0 560 320" role="img" aria-label="音高偏差刻度">
+          <defs>
+            <linearGradient id="arcGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#ff6b6b"/>
+              <stop offset="35%" stop-color="#f5a623"/>
+              <stop offset="50%" stop-color="#3dffa0"/>
+              <stop offset="65%" stop-color="#f5a623"/>
+              <stop offset="100%" stop-color="#ff6b6b"/>
+            </linearGradient>
+            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+            <filter id="softGlow" x="-80%" y="-80%" width="260%" height="260%">
+              <feGaussianBlur stdDeviation="8" result="blur"/>
+              <feMerge>
+                <feMergeNode in="blur"/>
+                <feMergeNode in="SourceGraphic"/>
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Background track -->
+          <path id="track" class="gauge-track" />
+          <!-- Active colored arc -->
+          <path id="active-arc" class="gauge-active" />
+          <!-- Tick marks (drawn by JS) -->
+          <g id="ticks"></g>
+          <!-- Hub + needle live in needle-layer (same origin) -->
+          <!-- In-tune lock ring -->
+          <circle id="lock-ring" class="lock-ring" cx="280" cy="250" r="22" />
+        </svg>
+
+        <!-- Readouts overlaid on gauge -->
+        <div class="readout">
+          <div class="note-block">
+            <div id="note-name" class="note-name">—</div>
+            <div id="note-octave" class="note-octave"></div>
+          </div>
+          <div class="note-meta">
+            <div id="freq-readout" class="freq">0.0 Hz</div>
+            <div id="cents-readout" class="cents">0 ¢</div>
+          </div>
+        </div>
+
+        <!-- Needle layer: SAME box + viewBox; hub and needle share origin (280,250) -->
+        <svg id="needle-layer" class="needle-layer" viewBox="0 0 560 320" aria-hidden="true">
+          <circle id="needle-hub" cx="280" cy="250" r="11" />
+          <g id="needle" class="gauge-needle" transform="rotate(0 280 250)">
+            <polygon id="needle-tip" points="280,82 287,250 273,250" />
+            <line id="needle-line" x1="280" y1="250" x2="280" y2="82" />
+          </g>
+          <circle id="needle-hub-inner" cx="280" cy="250" r="4" />
+        </svg>
+        </div><!-- /.gauge-stage -->
+
+        <!-- Direction hint -->
+        <div id="direction" class="direction">
+          <div class="direction-arrow" id="direction-arrow"></div>
+          <div class="direction-text" id="direction-text">待机</div>
+        </div>
+      </div>
+
+      <!-- String picker -->
+      <section class="strings-panel">
+        <div class="panel-head">
+          <h2 class="panel-title">选择琴弦</h2>
+          <p class="panel-desc" id="tuning-desc">标准调弦 · EADGBE</p>
+        </div>
+        <div id="string-list" class="string-list" role="listbox" aria-label="吉他琴弦"></div>
+      </section>
+    </main>
+
+    <!-- ── Footer hint ── -->
+    <footer class="footer">
+      <p>拨动琴弦，将指针对准中央绿色区域即可。</p>
+      <p class="footer-keys">提示：近距离对着麦克风拨弦，环境噪音越少越准</p>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
