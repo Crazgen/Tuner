@@ -5,12 +5,58 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --enable-logging"
+    "dev": "electron . --enable-logging",
+    "dist": "electron-builder --win --publish never"
   },
-  "keywords": ["tuner", "guitar", "electron", "audio"],
+  "keywords": [
+    "tuner",
+    "guitar",
+    "electron",
+    "audio"
+  ],
   "author": "Crazgen",
   "license": "MIT",
+  "build": {
+    "appId": "com.crazgen.guitartuner",
+    "productName": "Guitar Tuner",
+    "copyright": "Copyright (c) 2026 Crazgen",
+    "directories": {
+      "output": "dist",
+      "buildResources": "dist/build-resources"
+    },
+    "files": [
+      "src/**/*",
+      "main.js",
+      "preload.js",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "artifactName": "${productName}-Setup-${version}.${ext}"
+    },
+    "portable": {
+      "artifactName": "${productName}-Portable-${version}.${ext}"
+    }
+  },
   "devDependencies": {
-    "electron": "^33.2.0"
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
   }
 }

@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# Build / release output (all packaging artifacts & temp)
+dist/*
+!dist/README.md
+
 # OS / editor
 .DS_Store
 Thumbs.db
