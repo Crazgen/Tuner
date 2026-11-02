@@ -8,7 +8,7 @@
     "dev": "electron . --enable-logging"
   },
   "keywords": ["tuner", "guitar", "electron", "audio"],
-  "author": "",
+  "author": "Crazgen",
   "license": "MIT",
   "devDependencies": {
     "electron": "^33.2.0"
