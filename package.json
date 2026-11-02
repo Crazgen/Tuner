@@ -20,6 +20,7 @@
     "appId": "com.crazgen.guitartuner",
     "productName": "Guitar Tuner",
     "copyright": "Copyright (c) 2026 Crazgen",
+    "electronDist": "node_modules/electron/dist",
     "directories": {
       "output": "dist",
       "buildResources": "dist/build-resources"
